@@ -1,0 +1,49 @@
+name: Build
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - name: win-x64
+            os: windows-latest
+            configure: cmake -S . -B build -A x64
+            binary: build/Release/feedpoint.exe
+          - name: linux-x64
+            os: ubuntu-latest
+            configure: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+            binary: build/feedpoint
+          - name: linux-arm64
+            os: ubuntu-latest
+            setup: sudo apt-get update && sudo apt-get install -y gcc-aarch64-linux-gnu
+            configure: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_SYSTEM_NAME=Linux -DCMAKE_SYSTEM_PROCESSOR=aarch64 -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc
+            binary: build/feedpoint
+          - name: osx
+            os: macos-latest
+            configure: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64"
+            binary: build/feedpoint
+
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up
+        if: matrix.setup
+        run: ${{ matrix.setup }}
+
+      - name: Configure
+        run: ${{ matrix.configure }}
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: feedpoint-${{ matrix.name }}
+          path: ${{ matrix.binary }}
