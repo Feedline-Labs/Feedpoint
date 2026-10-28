@@ -1,4 +1,4 @@
-# Feedpoint protocol, version 1
+# Feedpoint protocol, version 2
 
 The host starts Feedpoint and talks to it over its standard input (requests)
 and standard output (responses). Standard error carries human-readable
@@ -41,7 +41,7 @@ terminator).
 
 | Op | Name               | Argument               | Payload on success                      | librtlsdr call                    |
 |----|--------------------|------------------------|-----------------------------------------|-----------------------------------|
-| 1  | Hello              | —                      | u32 protocol version, string driver path | —                                 |
+| 1  | Hello              | —                      | u32 protocol version, string driver path, string driver SHA-256 (lowercase hex) | —                                 |
 | 2  | List               | —                      | u32 count, then per device: string vendor, string product, string serial | `rtlsdr_get_device_count`, `rtlsdr_get_device_usb_strings` |
 | 3  | Open               | u32 device index       | —                                       | `rtlsdr_open`                     |
 | 4  | Close              | —                      | —                                       | `rtlsdr_close`                    |

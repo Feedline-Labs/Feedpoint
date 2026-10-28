@@ -58,3 +58,6 @@ dkms.conf
 build/
 out/
 .vs/
+
+# Approved drivers are checked in on purpose; see drivers/README.md.
+!drivers/**

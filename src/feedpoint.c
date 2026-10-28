@@ -42,7 +42,7 @@ typedef void *LibHandle;
 #include <mach-o/dyld.h>
 #endif
 
-#define PROTOCOL_VERSION 1
+#define PROTOCOL_VERSION 2
 #define MAX_PATH_LENGTH 4096
 
 /* Operations. Numbers are part of the protocol and never change. */
@@ -88,13 +88,17 @@ static int (*rtlsdr_reset_buffer)(rtlsdr_dev_t *);
 static int (*rtlsdr_read_sync)(rtlsdr_dev_t *, void *, int, int *);
 
 static char loadedLibraryPath[MAX_PATH_LENGTH] = "";
+static char loadedLibrarySha256[65] = "";
 
+/* The one approved driver per platform (see drivers/README.md). No other name
+   and no operating system search path: a node runs the proven driver or says
+   plainly that it cannot find it. */
 #if defined(_WIN32)
-static const char *libraryNames[] = { "librtlsdr-v4.dll", "librtlsdr.dll", "rtlsdr.dll", NULL };
+static const char *libraryName = "librtlsdr-v4.dll";
 #elif defined(__APPLE__)
-static const char *libraryNames[] = { "librtlsdr.dylib", "librtlsdr.0.dylib", NULL };
+static const char *libraryName = "librtlsdr-v4.dylib";
 #else
-static const char *libraryNames[] = { "librtlsdr-v4.so", "librtlsdr.so", "librtlsdr.so.0", "librtlsdr.so.2", NULL };
+static const char *libraryName = "librtlsdr-v4.so";
 #endif
 
 /* Folder this executable lives in, with a trailing separator. */
@@ -124,31 +128,89 @@ static LibHandle tryLoad(const char *path, const char *note)
     return library;
 }
 
-/* Resolution order: RTLSDR_LIBRARY_PATH -> beside this executable -> OS search. */
+/* RTLSDR_LIBRARY_PATH (for testing) if set, otherwise the approved driver
+   beside this executable. Nothing else. */
 static LibHandle loadLibrtlsdr(void)
 {
     const char *overridePath = getenv("RTLSDR_LIBRARY_PATH");
-    if (overridePath && overridePath[0]) {
-        LibHandle library = tryLoad(overridePath, "  (RTLSDR_LIBRARY_PATH)");
-        if (library) return library;
-    }
+    if (overridePath && overridePath[0])
+        return tryLoad(overridePath, "  (RTLSDR_LIBRARY_PATH)");
 
     char folder[MAX_PATH_LENGTH];
     char path[MAX_PATH_LENGTH];
     getExecutableFolder(folder, sizeof folder);
+    snprintf(path, sizeof path, "%s%s", folder, libraryName);
+    return tryLoad(path, "");
+}
 
-    for (int i = 0; libraryNames[i]; i++) {
-        snprintf(path, sizeof path, "%s%s", folder, libraryNames[i]);
-        LibHandle library = tryLoad(path, "");
-        if (library) return library;
+/* --- SHA-256 of the loaded driver, so the host can tell it is approved ------ */
+
+static const uint32_t sha256K[64] = {
+    0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+    0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+    0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+    0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+    0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+    0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+    0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+    0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
+};
+
+#define ROTR(x, n) (((x) >> (n)) | ((x) << (32 - (n))))
+
+static void sha256Block(uint32_t state[8], const uint8_t block[64])
+{
+    uint32_t w[64];
+    for (int i = 0; i < 16; i++)
+        w[i] = ((uint32_t)block[i * 4] << 24) | ((uint32_t)block[i * 4 + 1] << 16) |
+               ((uint32_t)block[i * 4 + 2] << 8) | (uint32_t)block[i * 4 + 3];
+    for (int i = 16; i < 64; i++) {
+        uint32_t s0 = ROTR(w[i - 15], 7) ^ ROTR(w[i - 15], 18) ^ (w[i - 15] >> 3);
+        uint32_t s1 = ROTR(w[i - 2], 17) ^ ROTR(w[i - 2], 19) ^ (w[i - 2] >> 10);
+        w[i] = w[i - 16] + s0 + w[i - 7] + s1;
     }
 
-    for (int i = 0; libraryNames[i]; i++) {
-        LibHandle library = tryLoad(libraryNames[i], "  (operating system search path)");
-        if (library) return library;
+    uint32_t a = state[0], b = state[1], c = state[2], d = state[3];
+    uint32_t e = state[4], f = state[5], g = state[6], h = state[7];
+    for (int i = 0; i < 64; i++) {
+        uint32_t t1 = h + (ROTR(e, 6) ^ ROTR(e, 11) ^ ROTR(e, 25)) + ((e & f) ^ (~e & g)) + sha256K[i] + w[i];
+        uint32_t t2 = (ROTR(a, 2) ^ ROTR(a, 13) ^ ROTR(a, 22)) + ((a & b) ^ (a & c) ^ (b & c));
+        h = g; g = f; f = e; e = d + t1; d = c; c = b; b = a; a = t1 + t2;
     }
+    state[0] += a; state[1] += b; state[2] += c; state[3] += d;
+    state[4] += e; state[5] += f; state[6] += g; state[7] += h;
+}
 
-    return NULL;
+/* Hashes the loaded driver file into loadedLibrarySha256 (lowercase hex). */
+static void hashLoadedLibrary(void)
+{
+    FILE *file = fopen(loadedLibraryPath, "rb");
+    if (!file) return;
+
+    uint32_t state[8] = { 0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
+                          0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19 };
+    uint8_t block[128];
+    uint64_t totalBytes = 0;
+    size_t length;
+
+    while ((length = fread(block, 1, 64, file)) == 64) {
+        sha256Block(state, block);
+        totalBytes += 64;
+    }
+    fclose(file);
+    totalBytes += length;
+
+    /* Padding: 0x80, zeros, then the bit length in the last 8 bytes. */
+    size_t padded = length < 56 ? 64 : 128;
+    block[length] = 0x80;
+    memset(block + length + 1, 0, padded - length - 1);
+    uint64_t bits = totalBytes * 8;
+    for (int i = 0; i < 8; i++) block[padded - 1 - i] = (uint8_t)(bits >> (8 * i));
+    sha256Block(state, block);
+    if (padded == 128) sha256Block(state, block + 64);
+
+    for (int i = 0; i < 8; i++)
+        snprintf(loadedLibrarySha256 + i * 8, 9, "%08x", state[i]);
 }
 
 #define RESOLVE(lib, name) \
@@ -275,7 +337,8 @@ static int32_t handle(uint8_t operation, const uint8_t *argument, uint32_t argum
 
     switch (operation) {
     case OpHello:
-        if (!appendUInt32(PROTOCOL_VERSION) || !appendString(loadedLibraryPath))
+        if (!appendUInt32(PROTOCOL_VERSION) || !appendString(loadedLibraryPath) ||
+            !appendString(loadedLibrarySha256))
             return STATUS_OUT_OF_MEMORY;
         return STATUS_OK;
     case OpList:
@@ -309,11 +372,12 @@ int main(void)
 
     LibHandle library = loadLibrtlsdr();
     if (!library) {
-        fprintf(stderr, "Feedpoint: the RTL-SDR driver could not be loaded. "
-                        "Copy it next to Feedpoint, or set RTLSDR_LIBRARY_PATH to its full path.\n");
+        fprintf(stderr, "Feedpoint: the RTL-SDR driver %s could not be loaded. "
+                        "It must sit next to Feedpoint.\n", libraryName);
         return 2;
     }
     if (!resolveEntryPoints(library)) return 3;
+    hashLoadedLibrary();
 
     /* Request: u8 operation, u32 argument length, argument bytes. */
     uint8_t header[5];

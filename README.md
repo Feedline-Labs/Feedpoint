@@ -13,16 +13,16 @@ protocol is documented in [PROTOCOL.md](PROTOCOL.md).
 
 ## Drivers
 
-Feedpoint loads librtlsdr at runtime. It looks, in order:
+Feedpoint loads exactly one approved driver, `librtlsdr-v4.dll` / `.so` /
+`.dylib`, from beside the Feedpoint executable. It never searches the
+operating system's library path, so a node runs the proven driver or reports
+plainly that it is missing. `RTLSDR_LIBRARY_PATH` overrides the location for
+testing. The Hello response includes the driver's SHA-256 so the host can
+confirm it is an approved build.
 
-1. The path in the `RTLSDR_LIBRARY_PATH` environment variable.
-2. Beside the Feedpoint executable: `librtlsdr-v4.dll`, `librtlsdr.dll`,
-   `rtlsdr.dll` (Windows); `librtlsdr-v4.so`, `librtlsdr.so`, `librtlsdr.so.0`,
-   `librtlsdr.so.2` (Linux); `librtlsdr.dylib`, `librtlsdr.0.dylib` (macOS).
-3. The operating system's library search path.
-
-On Windows, `libusb-1.0.dll` must sit beside the driver. The RTL-SDR Blog fork
-of librtlsdr is recommended: it is required for RTL-SDR Blog V3/V4 dongles.
+The approved drivers, their exact source code, licenses and attribution are in
+[`drivers/`](drivers). On Windows, `libusb-1.0.dll` must sit beside the driver;
+on Linux the driver uses the system libusb-1.0.
 
 ## Building
 
@@ -35,11 +35,12 @@ builds download from the workflow run's page.
 
 Feedpoint builds on the work of:
 
-- [osmocom rtl-sdr](https://osmocom.org/projects/rtl-sdr/wiki) — the original
-  librtlsdr (GPL-2.0-or-later).
-- [RTL-SDR Blog](https://github.com/rtlsdrblog/rtl-sdr-blog) — the librtlsdr
-  fork with V3/V4 support (GPL-2.0-or-later).
+- [osmocom rtl-sdr](https://gitea.osmocom.org/sdr/rtl-sdr) — librtlsdr
+  (GPL-2.0-or-later), including the RTL-SDR Blog team's V4 support.
 - [libusb](https://libusb.info) — USB access (LGPL-2.1-or-later).
+
+Full attribution and license texts for the bundled drivers are in
+[`drivers/README.md`](drivers/README.md).
 
 Feedpoint is used by [AirPulse](https://feedlinelabs.com) from Feedline Labs.
 

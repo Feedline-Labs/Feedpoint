@@ -10,19 +10,23 @@ jobs:
       matrix:
         include:
           - name: win-x64
+            drivers: win-x64
             os: windows-latest
             configure: cmake -S . -B build -A x64
             binary: build/Release/feedpoint.exe
           - name: linux-x64
+            drivers: linux-x64
             os: ubuntu-latest
             configure: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
             binary: build/feedpoint
           - name: linux-arm64
+            drivers: linux-arm64
             os: ubuntu-latest
             setup: sudo apt-get update && sudo apt-get install -y gcc-aarch64-linux-gnu
             configure: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_SYSTEM_NAME=Linux -DCMAKE_SYSTEM_PROCESSOR=aarch64 -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc
             binary: build/feedpoint
           - name: osx
+            drivers: osx
             os: macos-latest
             configure: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64"
             binary: build/feedpoint
@@ -43,7 +47,16 @@ jobs:
       - name: Build
         run: cmake --build build --config Release
 
+      # One folder per platform: feedpoint plus its approved drivers, ready to
+      # drop into the matching AirPulse runtimes folder.
+      - name: Package
+        shell: bash
+        run: |
+          mkdir package
+          cp ${{ matrix.binary }} package/
+          cp drivers/${{ matrix.drivers }}/* package/
+
       - uses: actions/upload-artifact@v4
         with:
           name: feedpoint-${{ matrix.name }}
-          path: ${{ matrix.binary }}
+          path: package/
