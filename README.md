@@ -1,6 +1,6 @@
-# Feedpoint
+# Feedpoint - A Universal SDR Gateway
 
-Open-source RTL-SDR dongle server: tune, read, return raw IQ.
+Open-source RTL-SDR: tune, read, return raw IQ.
 
 Feedpoint is a small standalone program that owns one RTL-SDR dongle. A host
 program starts it, sends requests on its standard input and reads responses
