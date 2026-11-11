@@ -38,7 +38,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Set up
         if: matrix.setup
@@ -59,7 +59,7 @@ jobs:
           cp ${{ matrix.binary }} package/
           cp drivers/${{ matrix.drivers }}/* package/
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: feedpoint-${{ matrix.name }}
           path: package/
