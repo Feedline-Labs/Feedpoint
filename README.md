@@ -1,4 +1,4 @@
-# Feedpoint
+# Feedpoint - A Universal SDR Gateway
 
 Open-source RTL-SDR dongle server: tune, read, return raw IQ.
 
@@ -10,6 +10,54 @@ Feedpoint does no signal processing; all timing and DSP belong to the host.
 
 Any program that can start a process and use its pipes can use Feedpoint. The
 protocol is documented in [PROTOCOL.md](PROTOCOL.md).
+
+## Example
+
+A minimal Python host: open the first dongle, tune to 147.600 MHz and read one
+block of raw IQ.
+
+```python
+import struct, subprocess
+from enum import IntEnum
+
+class Op(IntEnum):              # matches PROTOCOL.md
+    UNASSIGNED = 0
+    HELLO = 1
+    LIST = 2
+    OPEN = 3
+    CLOSE = 4
+    SET_SAMPLE_RATE = 5
+    SET_CENTER_FREQUENCY = 6
+    SET_TUNER_BANDWIDTH = 7
+    SET_AGC_MODE = 8
+    SET_TUNER_GAIN_MODE = 9
+    SET_TUNER_GAIN = 10
+    RESET_BUFFER = 11
+    READ_SYNC = 12
+
+fp = subprocess.Popen(["./feedpoint"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+
+def call(op, value=None):
+    arg = b"" if value is None else struct.pack("<I", value)
+    fp.stdin.write(struct.pack("<BI", op, len(arg)) + arg)
+    fp.stdin.flush()
+    status, length = struct.unpack("<iI", fp.stdout.read(8))
+    if status != 0:
+        raise RuntimeError(f"{op.name} failed: {status}")
+    return fp.stdout.read(length)
+
+call(Op.OPEN, 0)                            # device 0
+call(Op.SET_SAMPLE_RATE, 900_001)           # lowest rate in librtlsdr's 0.9–3.2 MS/s range
+call(Op.SET_CENTER_FREQUENCY, 147_600_000)  # 147.600 MHz
+call(Op.SET_TUNER_GAIN_MODE, 0)             # auto gain
+call(Op.RESET_BUFFER)
+iq = call(Op.READ_SYNC, 16_384)             # bytes, multiple of 512
+
+for i in range(0, 10, 2):                   # unsigned 8-bit, centered on 127.5
+    print(iq[i] - 127.5, iq[i + 1] - 127.5)
+
+fp.stdin.close()                            # Feedpoint closes the dongle and exits
+```
 
 ## Drivers
 
