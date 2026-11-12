@@ -50,6 +50,11 @@ approved one.
 5. **Match the existing code.** Readable, no defensive layers, no new
    abstractions. One operation is a table row and a `case`.
 
+## Pull requests
+
+Fork the repository, make your change on a branch, and open a pull request
+against `main`. Keep each pull request to one change.
+
 ## What happens next
 
 Every pull request is reviewed and approved by Feedline Labs before it
