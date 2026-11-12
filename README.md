@@ -79,6 +79,12 @@ development with C++" workload, or use CMake directly. GitHub Actions builds
 Windows x64, Linux x64, Linux arm64 and macOS (universal) on every push; the
 builds download from the workflow run's page.
 
+## Roadmap and working on Feedpoint
+
+Feedpoint 1.0.0 covers what AirPulse needs. The rest of the tuner controls and
+gapless streaming are planned in [ROADMAP.md](ROADMAP.md). To propose or add
+an operation, see [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## Credits
 
 Feedpoint builds on the work of:
