@@ -6,8 +6,8 @@ it. Changes to Feedpoint itself are welcome when they keep it that way.
 
 ## What Feedpoint will always be
 
-- **Small.** Plain C99 in `src/`. The source layout changes only for a
-  [roadmap](ROADMAP.md) item.
+- **Small.** Plain C99 in `src/`, tests in `tests/`. The source layout
+  changes only for a [roadmap](ROADMAP.md) item.
 - **No libraries.** Only the C library and the operating system's loader and
   threads. A pull request that adds a dependency or a package will be closed.
 - **Only functions the driver has.** An operation calls a function that exists
@@ -42,11 +42,14 @@ approved one.
    needs it. Check [ROADMAP.md](ROADMAP.md); it may already be planned.
 2. **Append, never renumber.** A new operation takes the next free number.
    Existing numbers, arguments and payloads never change.
-3. **Document it in the same pull request:** a row in
-   [PROTOCOL.md](PROTOCOL.md) and a line in the README's `Op` enum.
-4. **Test it on a real dongle.** No mocks. In the pull request, say which
-   dongle and operating system you used and what you saw (for example: set
-   the value, read it back, IQ still looks right).
+3. **Name it once, the same everywhere.** The name in
+   [PROTOCOL.md](PROTOCOL.md) (`SetSampleRate`) is `Op` + name in
+   `src/protocol.h` (`OpSetSampleRate`), upper snake case in the README's
+   Python `Op` enum (`SET_SAMPLE_RATE`), and the test's name
+   (`SetSampleRate`). All four change in the same pull request.
+4. **Test it on a real dongle.** No mocks. Add a case to
+   [`tests/feedpoint_test.c`](tests/README.md) and run all the tests. In the
+   pull request, say which dongle and operating system you used.
 5. **Match the existing code.** Readable, no defensive layers, no new
    abstractions. One operation is a table row and a `case`.
 
