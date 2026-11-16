@@ -2,6 +2,8 @@
 
 Open-source RTL-SDR dongle server: tune, read, return raw IQ.
 
+<img width="2400" height="1320" alt="image" src="https://github.com/user-attachments/assets/1c9d2881-20b0-4c17-af2f-340e3a925387" />
+<BR><BR>
 Feedpoint is a small standalone program that owns one RTL-SDR dongle. A host
 program starts it, sends requests on its standard input and reads responses
 from its standard output. Each request is one librtlsdr call: list devices,
