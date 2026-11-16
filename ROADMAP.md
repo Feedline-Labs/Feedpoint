@@ -13,47 +13,21 @@ ReadSync. See [PROTOCOL.md](PROTOCOL.md).
 
 ## 1.1 — the rest of the tuner controls
 
-Everything in this release adds to the protocol. Operations 1–12 keep their
-numbers, arguments and payloads, so existing hosts keep working. New
-operations get the next free number in the order they are merged.
+Operations 13–32: GetVersion, the gain list, reading settings back, frequency
+correction, bias tee, direct sampling, offset tuning, crystal frequency, IF
+gain, and finding dongles by serial. Each is documented in
+[PROTOCOL.md](PROTOCOL.md), with its librtlsdr call.
 
-**First, with no change in behavior:** replace the range checks in `handle()`
-(`needsValue`, `operation >= OpClose`) with one table row per operation
-(number, needs an open device, argument). After that, adding an operation is
-one row plus one `case`.
+Everything in this release adds to the protocol, so hosts written for 1.0
+keep working; see Compatibility in [PROTOCOL.md](PROTOCOL.md). Each operation
+is now one row in Feedpoint's operation table plus one `case`, and an
+operation Feedpoint does not know always returns -9001.
 
-**Protocol:** the version goes to 3, so a host can tell the new operations
-exist. Arguments may be more than one u32, or a string (u32 length + bytes),
-still 64 bytes at most.
-
-| Operation | Argument | Payload | librtlsdr call |
-|---|---|---|---|
-| GetVersion | — | string Feedpoint version | — |
-| GetTunerGains | — | u32 count, then i32 gains (tenths of a dB) | `rtlsdr_get_tuner_gains` |
-| GetTunerGain | — | i32 tenths of a dB | `rtlsdr_get_tuner_gain` |
-| GetSampleRate | — | u32 Hz | `rtlsdr_get_sample_rate` |
-| GetCenterFrequency | — | u32 Hz | `rtlsdr_get_center_freq` |
-| GetTunerType | — | u32 tuner type | `rtlsdr_get_tuner_type` |
-| SetFrequencyCorrection | i32 ppm | — | `rtlsdr_set_freq_correction` |
-| GetFrequencyCorrection | — | i32 ppm | `rtlsdr_get_freq_correction` |
-| SetBiasTee | u32 0 / 1 | — | `rtlsdr_set_bias_tee` |
-| SetBiasTeeGpio | u32 gpio, u32 0 / 1 | — | `rtlsdr_set_bias_tee_gpio` |
-| SetDirectSampling | u32 0 = off, 1 = I, 2 = Q | — | `rtlsdr_set_direct_sampling` |
-| GetDirectSampling | — | u32 | `rtlsdr_get_direct_sampling` |
-| SetOffsetTuning | u32 0 / 1 | — | `rtlsdr_set_offset_tuning` |
-| GetOffsetTuning | — | u32 | `rtlsdr_get_offset_tuning` |
-| SetXtalFrequency | u32 RTL Hz, u32 tuner Hz | — | `rtlsdr_set_xtal_freq` |
-| GetXtalFrequency | — | u32 RTL Hz, u32 tuner Hz | `rtlsdr_get_xtal_freq` |
-| SetTunerIfGain | u32 stage, i32 tenths of a dB | — | `rtlsdr_set_tuner_if_gain` |
-| GetIndexBySerial | string serial | u32 device index | `rtlsdr_get_index_by_serial` |
-| GetDeviceName | u32 device index | string name | `rtlsdr_get_device_name` |
-| GetUsbStrings | — | string vendor, product, serial of the open device | `rtlsdr_get_usb_strings` |
-
-**Testing:** every operation is tested against a real dongle, never a mock:
-set a value, read it back with the matching Get, and confirm the IQ still
-looks right. Because the driver does not change, AirPulse SNR should not
-change either; spot-check it against 1.0.0 on the same hardware before
-release.
+**Testing:** every operation has a test named after it in
+[tests/](tests/README.md), run against a real dongle, never a mock. Set
+operations read their value back with the matching Get. Because the driver
+does not change, AirPulse SNR should not change either; spot-check it
+against 1.0.0 on the same hardware before release.
 
 ## 1.2 — library build and mobile
 

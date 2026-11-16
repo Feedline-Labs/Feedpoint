@@ -42,33 +42,51 @@ typedef void *LibHandle;
 #include <mach-o/dyld.h>
 #endif
 
-#define PROTOCOL_VERSION 2
+#include "protocol.h"
+
 #define MAX_PATH_LENGTH 4096
 
-/* Operations. Numbers are part of the protocol and never change. */
-enum Operation {
-    OpUnassigned = 0,
-    OpHello = 1,
-    OpList = 2,
-    OpOpen = 3,
-    OpClose = 4,
-    OpSetSampleRate = 5,
-    OpSetCenterFrequency = 6,
-    OpSetTunerBandwidth = 7,
-    OpSetAgcMode = 8,
-    OpSetTunerGainMode = 9,
-    OpSetTunerGain = 10,
-    OpResetBuffer = 11,
-    OpReadSync = 12
+/* What each operation needs before it runs, indexed by operation byte.
+   An operation with no row needs nothing and is answered as unknown. */
+struct OperationRule {
+    uint32_t argumentLength; /* minimum argument bytes */
+    int needsDevice;
 };
 
-/* Feedpoint's own status codes, kept clear of librtlsdr/libusb codes. */
-#define STATUS_OK 0
-#define STATUS_UNKNOWN_OPERATION -9001
-#define STATUS_BAD_REQUEST -9002
-#define STATUS_NOT_OPEN -9003
-#define STATUS_ALREADY_OPEN -9004
-#define STATUS_OUT_OF_MEMORY -9005
+static const struct OperationRule operationRules[UINT8_MAX + 1] = {
+    [OpHello]                  = { 0, 0 },
+    [OpList]                   = { 0, 0 },
+    [OpOpen]                   = { 4, 0 },
+    [OpClose]                  = { 0, 1 },
+    [OpSetSampleRate]          = { 4, 1 },
+    [OpSetCenterFrequency]     = { 4, 1 },
+    [OpSetTunerBandwidth]      = { 4, 1 },
+    [OpSetAgcMode]             = { 4, 1 },
+    [OpSetTunerGainMode]       = { 4, 1 },
+    [OpSetTunerGain]           = { 4, 1 },
+    [OpResetBuffer]            = { 0, 1 },
+    [OpReadSync]               = { 4, 1 },
+    [OpGetVersion]             = { 0, 0 },
+    [OpGetTunerGains]          = { 0, 1 },
+    [OpGetTunerGain]           = { 0, 1 },
+    [OpGetSampleRate]          = { 0, 1 },
+    [OpGetCenterFrequency]     = { 0, 1 },
+    [OpGetTunerType]           = { 0, 1 },
+    [OpSetFrequencyCorrection] = { 4, 1 },
+    [OpGetFrequencyCorrection] = { 0, 1 },
+    [OpSetBiasTee]             = { 4, 1 },
+    [OpSetBiasTeeGpio]         = { 8, 1 },
+    [OpSetDirectSampling]      = { 4, 1 },
+    [OpGetDirectSampling]      = { 0, 1 },
+    [OpSetOffsetTuning]        = { 4, 1 },
+    [OpGetOffsetTuning]        = { 0, 1 },
+    [OpSetXtalFrequency]       = { 8, 1 },
+    [OpGetXtalFrequency]       = { 0, 1 },
+    [OpSetTunerIfGain]         = { 8, 1 },
+    [OpGetIndexBySerial]       = { 4, 0 },
+    [OpGetDeviceName]          = { 4, 0 },
+    [OpGetUsbStrings]          = { 0, 1 },
+};
 
 /* --- librtlsdr entry points, resolved at runtime --------------------------- */
 
@@ -86,6 +104,25 @@ static int (*rtlsdr_set_tuner_gain_mode)(rtlsdr_dev_t *, int);
 static int (*rtlsdr_set_tuner_gain)(rtlsdr_dev_t *, int);
 static int (*rtlsdr_reset_buffer)(rtlsdr_dev_t *);
 static int (*rtlsdr_read_sync)(rtlsdr_dev_t *, void *, int, int *);
+static int (*rtlsdr_get_tuner_gains)(rtlsdr_dev_t *, int *);
+static int (*rtlsdr_get_tuner_gain)(rtlsdr_dev_t *);
+static uint32_t (*rtlsdr_get_sample_rate)(rtlsdr_dev_t *);
+static uint32_t (*rtlsdr_get_center_freq)(rtlsdr_dev_t *);
+static int (*rtlsdr_get_tuner_type)(rtlsdr_dev_t *);
+static int (*rtlsdr_set_freq_correction)(rtlsdr_dev_t *, int);
+static int (*rtlsdr_get_freq_correction)(rtlsdr_dev_t *);
+static int (*rtlsdr_set_bias_tee)(rtlsdr_dev_t *, int);
+static int (*rtlsdr_set_bias_tee_gpio)(rtlsdr_dev_t *, int, int);
+static int (*rtlsdr_set_direct_sampling)(rtlsdr_dev_t *, int);
+static int (*rtlsdr_get_direct_sampling)(rtlsdr_dev_t *);
+static int (*rtlsdr_set_offset_tuning)(rtlsdr_dev_t *, int);
+static int (*rtlsdr_get_offset_tuning)(rtlsdr_dev_t *);
+static int (*rtlsdr_set_xtal_freq)(rtlsdr_dev_t *, uint32_t, uint32_t);
+static int (*rtlsdr_get_xtal_freq)(rtlsdr_dev_t *, uint32_t *, uint32_t *);
+static int (*rtlsdr_set_tuner_if_gain)(rtlsdr_dev_t *, int, int);
+static int (*rtlsdr_get_index_by_serial)(const char *);
+static const char *(*rtlsdr_get_device_name)(uint32_t);
+static int (*rtlsdr_get_usb_strings)(rtlsdr_dev_t *, char *, char *, char *);
 
 static char loadedLibraryPath[MAX_PATH_LENGTH] = "";
 static char loadedLibrarySha256[65] = "";
@@ -233,6 +270,25 @@ static int resolveEntryPoints(LibHandle library)
     RESOLVE(library, rtlsdr_set_tuner_gain)
     RESOLVE(library, rtlsdr_reset_buffer)
     RESOLVE(library, rtlsdr_read_sync)
+    RESOLVE(library, rtlsdr_get_tuner_gains)
+    RESOLVE(library, rtlsdr_get_tuner_gain)
+    RESOLVE(library, rtlsdr_get_sample_rate)
+    RESOLVE(library, rtlsdr_get_center_freq)
+    RESOLVE(library, rtlsdr_get_tuner_type)
+    RESOLVE(library, rtlsdr_set_freq_correction)
+    RESOLVE(library, rtlsdr_get_freq_correction)
+    RESOLVE(library, rtlsdr_set_bias_tee)
+    RESOLVE(library, rtlsdr_set_bias_tee_gpio)
+    RESOLVE(library, rtlsdr_set_direct_sampling)
+    RESOLVE(library, rtlsdr_get_direct_sampling)
+    RESOLVE(library, rtlsdr_set_offset_tuning)
+    RESOLVE(library, rtlsdr_get_offset_tuning)
+    RESOLVE(library, rtlsdr_set_xtal_freq)
+    RESOLVE(library, rtlsdr_get_xtal_freq)
+    RESOLVE(library, rtlsdr_set_tuner_if_gain)
+    RESOLVE(library, rtlsdr_get_index_by_serial)
+    RESOLVE(library, rtlsdr_get_device_name)
+    RESOLVE(library, rtlsdr_get_usb_strings)
     return 1;
 }
 
@@ -289,6 +345,17 @@ static int appendString(const char *text)
     return 1;
 }
 
+/* Successful replies carrying one value. */
+static int32_t replyUInt32(uint32_t value)
+{
+    return appendUInt32(value) ? STATUS_OK : STATUS_OUT_OF_MEMORY;
+}
+
+static int32_t replyString(const char *text)
+{
+    return appendString(text) ? STATUS_OK : STATUS_OUT_OF_MEMORY;
+}
+
 static void writeResponse(int32_t status)
 {
     uint8_t header[8];
@@ -326,14 +393,62 @@ static int32_t handleReadSync(uint32_t byteCount)
     return status;
 }
 
+static int32_t handleGetTunerGains(void)
+{
+    int count = rtlsdr_get_tuner_gains(device, NULL);
+    if (count < 0) return count;
+
+    int *gains = calloc((size_t)count + 1, sizeof *gains); /* +1: never a zero-size allocation */
+    if (!gains) return STATUS_OUT_OF_MEMORY;
+    rtlsdr_get_tuner_gains(device, gains);
+
+    int32_t status = appendUInt32((uint32_t)count) ? STATUS_OK : STATUS_OUT_OF_MEMORY;
+    for (int i = 0; i < count && status == STATUS_OK; i++)
+        if (!appendUInt32((uint32_t)gains[i])) status = STATUS_OUT_OF_MEMORY;
+    free(gains);
+    return status;
+}
+
+static int32_t handleGetXtalFrequency(void)
+{
+    uint32_t rtlFrequency = 0, tunerFrequency = 0;
+    int32_t status = rtlsdr_get_xtal_freq(device, &rtlFrequency, &tunerFrequency);
+    if (status != STATUS_OK) return status;
+    if (!appendUInt32(rtlFrequency) || !appendUInt32(tunerFrequency)) return STATUS_OUT_OF_MEMORY;
+    return STATUS_OK;
+}
+
+/* Argument: string serial (u32 length, then the bytes). */
+static int32_t handleGetIndexBySerial(const uint8_t *argument, uint32_t argumentLength)
+{
+    char serial[64];
+    uint32_t length = getUInt32(argument);
+    if (length > argumentLength - 4) return STATUS_BAD_REQUEST;
+    memcpy(serial, argument + 4, length);
+    serial[length] = '\0';
+
+    int index = rtlsdr_get_index_by_serial(serial);
+    return index < 0 ? index : replyUInt32((uint32_t)index);
+}
+
+static int32_t handleGetUsbStrings(void)
+{
+    char vendor[256] = "", product[256] = "", serial[256] = "";
+    int32_t status = rtlsdr_get_usb_strings(device, vendor, product, serial);
+    if (status != STATUS_OK) return status;
+    if (!appendString(vendor) || !appendString(product) || !appendString(serial))
+        return STATUS_OUT_OF_MEMORY;
+    return STATUS_OK;
+}
+
 static int32_t handle(uint8_t operation, const uint8_t *argument, uint32_t argumentLength)
 {
+    const struct OperationRule *rule = &operationRules[operation];
+    if (argumentLength < rule->argumentLength) return STATUS_BAD_REQUEST;
+    if (rule->needsDevice && !device) return STATUS_NOT_OPEN;
+
     uint32_t value = argumentLength >= 4 ? getUInt32(argument) : 0;
-    int needsValue = operation >= OpOpen && operation != OpClose && operation != OpResetBuffer;
-
-    if (needsValue && argumentLength < 4) return STATUS_BAD_REQUEST;
-
-    if (operation >= OpClose && !device) return STATUS_NOT_OPEN;
+    uint32_t second = argumentLength >= 8 ? getUInt32(argument + 4) : 0;
 
     switch (operation) {
     case OpHello:
@@ -351,14 +466,34 @@ static int32_t handle(uint8_t operation, const uint8_t *argument, uint32_t argum
         device = NULL;
         return status;
     }
-    case OpSetSampleRate:      return rtlsdr_set_sample_rate(device, value);
-    case OpSetCenterFrequency: return rtlsdr_set_center_freq(device, value);
-    case OpSetTunerBandwidth:  return rtlsdr_set_tuner_bandwidth(device, value);
-    case OpSetAgcMode:         return rtlsdr_set_agc_mode(device, (int)value);
-    case OpSetTunerGainMode:   return rtlsdr_set_tuner_gain_mode(device, (int)value);
-    case OpSetTunerGain:       return rtlsdr_set_tuner_gain(device, (int32_t)value);
-    case OpResetBuffer:        return rtlsdr_reset_buffer(device);
-    case OpReadSync:           return handleReadSync(value);
+    case OpSetSampleRate:          return rtlsdr_set_sample_rate(device, value);
+    case OpSetCenterFrequency:     return rtlsdr_set_center_freq(device, value);
+    case OpSetTunerBandwidth:      return rtlsdr_set_tuner_bandwidth(device, value);
+    case OpSetAgcMode:             return rtlsdr_set_agc_mode(device, (int)value);
+    case OpSetTunerGainMode:       return rtlsdr_set_tuner_gain_mode(device, (int)value);
+    case OpSetTunerGain:           return rtlsdr_set_tuner_gain(device, (int32_t)value);
+    case OpResetBuffer:            return rtlsdr_reset_buffer(device);
+    case OpReadSync:               return handleReadSync(value);
+    case OpGetVersion:             return replyString(FEEDPOINT_VERSION);
+    case OpGetTunerGains:          return handleGetTunerGains();
+    case OpGetTunerGain:           return replyUInt32((uint32_t)rtlsdr_get_tuner_gain(device));
+    case OpGetSampleRate:          return replyUInt32(rtlsdr_get_sample_rate(device));
+    case OpGetCenterFrequency:     return replyUInt32(rtlsdr_get_center_freq(device));
+    case OpGetTunerType:           return replyUInt32((uint32_t)rtlsdr_get_tuner_type(device));
+    case OpSetFrequencyCorrection: return rtlsdr_set_freq_correction(device, (int32_t)value);
+    case OpGetFrequencyCorrection: return replyUInt32((uint32_t)rtlsdr_get_freq_correction(device));
+    case OpSetBiasTee:             return rtlsdr_set_bias_tee(device, (int)value);
+    case OpSetBiasTeeGpio:         return rtlsdr_set_bias_tee_gpio(device, (int)value, (int)second);
+    case OpSetDirectSampling:      return rtlsdr_set_direct_sampling(device, (int)value);
+    case OpGetDirectSampling:      return replyUInt32((uint32_t)rtlsdr_get_direct_sampling(device));
+    case OpSetOffsetTuning:        return rtlsdr_set_offset_tuning(device, (int)value);
+    case OpGetOffsetTuning:        return replyUInt32((uint32_t)rtlsdr_get_offset_tuning(device));
+    case OpSetXtalFrequency:       return rtlsdr_set_xtal_freq(device, value, second);
+    case OpGetXtalFrequency:       return handleGetXtalFrequency();
+    case OpSetTunerIfGain:         return rtlsdr_set_tuner_if_gain(device, (int)value, (int32_t)second);
+    case OpGetIndexBySerial:       return handleGetIndexBySerial(argument, argumentLength);
+    case OpGetDeviceName:          return replyString(rtlsdr_get_device_name(value));
+    case OpGetUsbStrings:          return handleGetUsbStrings();
     default:                   return STATUS_UNKNOWN_OPERATION;
     }
 }

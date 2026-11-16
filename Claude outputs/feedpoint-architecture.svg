@@ -1,0 +1,130 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 660" width="1200" height="660" font-family="'Segoe UI','Helvetica Neue',Helvetica,Arial,sans-serif" xmlns:c2pa="http://c2pa.org/manifest">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f7f9fc"/>
+      <stop offset="1" stop-color="#eaf0f7"/>
+    </linearGradient>
+    <linearGradient id="feedpoint" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1f5fa8"/>
+      <stop offset="1" stop-color="#2f7fd0"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#1b2a3d" flood-opacity="0.14"/>
+    </filter>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#2f7fd0"/>
+    </marker>
+    <marker id="arrowDark" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#41526a"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="660" fill="url(#bg)"/>
+
+  <!-- title -->
+  <text x="48" y="64" font-size="32" font-weight="700" fill="#14233a">Feedpoint</text>
+  <text x="212" y="64" font-size="22" fill="#5a6b82">how it fits together</text>
+  <rect x="48" y="80" width="56" height="4" rx="2" fill="#2f7fd0"/>
+
+  <!-- your program -->
+  <g filter="url(#shadow)">
+    <rect x="48" y="130" width="260" height="230" rx="14" fill="#ffffff" stroke="#d3dce8"/>
+  </g>
+  <text x="72" y="170" font-size="12" font-weight="700" fill="#2f7fd0" letter-spacing="1.5">HOST</text>
+  <text x="72" y="198" font-size="22" font-weight="700" fill="#14233a">Your program</text>
+  <text x="72" y="228" font-size="15" fill="#41526a">AirPulse or any app, in any</text>
+  <text x="72" y="248" font-size="15" fill="#41526a">language: Python, C#, C, Go …</text>
+  <line x1="72" y1="268" x2="284" y2="268" stroke="#e3e9f1"/>
+  <text x="72" y="294" font-size="15" fill="#41526a">Does all timing and</text>
+  <text x="72" y="314" font-size="15" fill="#41526a">signal processing</text>
+  <text x="72" y="342" font-size="13" fill="#7a8aa0">One Feedpoint per dongle</text>
+
+  <!-- pipes -->
+  <line x1="316" y1="208" x2="430" y2="208" stroke="#2f7fd0" stroke-width="3" marker-end="url(#arrowBlue)"/>
+  <line x1="430" y1="262" x2="316" y2="262" stroke="#2f7fd0" stroke-width="3" marker-end="url(#arrowBlue)"/>
+  <text x="373" y="194" font-size="13" font-weight="600" fill="#1f5fa8" text-anchor="middle">stdin · requests</text>
+  <text x="373" y="290" font-size="13" font-weight="600" fill="#1f5fa8" text-anchor="middle">stdout · responses</text>
+  <text x="373" y="308" font-size="12" fill="#7a8aa0" text-anchor="middle">settings and raw IQ</text>
+
+  <!-- feedpoint -->
+  <g filter="url(#shadow)">
+    <rect x="440" y="120" width="290" height="250" rx="14" fill="url(#feedpoint)"/>
+  </g>
+  <text x="466" y="160" font-size="12" font-weight="700" fill="#cfe2f7" letter-spacing="1.5">GATEWAY · GPLv3</text>
+  <text x="466" y="194" font-size="28" font-weight="700" fill="#ffffff">Feedpoint</text>
+  <text x="466" y="228" font-size="15" fill="#e6f0fb">One small C program</text>
+  <text x="466" y="252" font-size="15" fill="#e6f0fb">One request = one driver call</text>
+  <text x="466" y="276" font-size="15" fill="#e6f0fb">32 operations · PROTOCOL.md</text>
+  <text x="466" y="300" font-size="15" fill="#e6f0fb">Reports the driver's SHA-256</text>
+  <rect x="466" y="320" width="150" height="28" rx="14" fill="#ffffff" fill-opacity="0.16"/>
+  <text x="541" y="339" font-size="13" font-weight="600" fill="#ffffff" text-anchor="middle">No DSP, raw IQ only</text>
+
+  <!-- loads -->
+  <line x1="738" y1="245" x2="808" y2="245" stroke="#41526a" stroke-width="2.5" marker-end="url(#arrowDark)"/>
+  <text x="773" y="232" font-size="12" fill="#5a6b82" text-anchor="middle">loads at</text>
+  <text x="773" y="266" font-size="12" fill="#5a6b82" text-anchor="middle">runtime</text>
+
+  <!-- driver -->
+  <g filter="url(#shadow)">
+    <rect x="818" y="130" width="334" height="230" rx="14" fill="#ffffff" stroke="#d3dce8"/>
+  </g>
+  <text x="842" y="170" font-size="12" font-weight="700" fill="#2f7fd0" letter-spacing="1.5">APPROVED DRIVER</text>
+  <text x="842" y="198" font-size="22" font-weight="700" fill="#14233a">librtlsdr-v4</text>
+  <text x="842" y="224" font-size="14" fill="#41526a">osmocom rtl-sdr 84195f1, beside Feedpoint</text>
+  <text x="842" y="244" font-size="14" fill="#41526a">Same source on every platform, so SNR agrees</text>
+  <rect x="842" y="264" width="286" height="40" rx="8" fill="#f1f5fa" stroke="#d3dce8"/>
+  <text x="858" y="289" font-size="15" font-weight="600" fill="#14233a">libusb</text>
+  <text x="912" y="289" font-size="13" fill="#5a6b82">USB access</text>
+  <text x="842" y="336" font-size="13" fill="#7a8aa0">SHA-256 listed in drivers/README.md</text>
+
+  <!-- usb to dongle -->
+  <path d="M985,360 L985,404" stroke="#41526a" stroke-width="2.5" marker-end="url(#arrowDark)"/>
+  <text x="996" y="388" font-size="12" font-weight="600" fill="#5a6b82">USB</text>
+
+  <!-- dongle -->
+  <g filter="url(#shadow)">
+    <rect x="888" y="410" width="196" height="54" rx="12" fill="#14233a"/>
+  </g>
+  <rect x="1084" y="424" width="14" height="26" rx="3" fill="#8a9bb2"/>
+  <text x="906" y="434" font-size="11" font-weight="700" fill="#8fb6e3" letter-spacing="1.2">RTL2832U</text>
+  <text x="906" y="454" font-size="16" font-weight="700" fill="#ffffff">SDR dongle</text>
+
+  <!-- antenna + pulsing wave -->
+  <g transform="translate(0,14)">
+  <path d="M874,423 L846,423 L846,404" stroke="#41526a" stroke-width="2.5" fill="none"/>
+  <path d="M846,404 L834,382 M846,404 L858,382 M846,404 L846,376" stroke="#41526a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M818,380 C808,390 808,404 818,414" stroke="#2f7fd0" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M804,368 C788,384 788,410 804,426" stroke="#2f7fd0" stroke-width="2.2" fill="none" stroke-linecap="round" opacity="0.65"/>
+  <path d="M790,356 C768,378 768,416 790,438" stroke="#2f7fd0" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.35"/>
+  </g>
+
+  <!-- platforms -->
+  <text x="48" y="512" font-size="12" font-weight="700" fill="#2f7fd0" letter-spacing="1.5">SUPPORTED PLATFORMS · ONE APPROVED DRIVER EACH</text>
+
+  <g filter="url(#shadow)">
+    <rect x="48" y="528" width="262" height="92" rx="12" fill="#ffffff" stroke="#d3dce8"/>
+    <rect x="322" y="528" width="262" height="92" rx="12" fill="#ffffff" stroke="#d3dce8"/>
+    <rect x="596" y="528" width="262" height="92" rx="12" fill="#ffffff" stroke="#d3dce8"/>
+    <rect x="870" y="528" width="282" height="92" rx="12" fill="#ffffff" stroke="#d3dce8"/>
+  </g>
+  <rect x="48" y="528" width="6" height="92" rx="3" fill="#2f7fd0"/>
+  <rect x="322" y="528" width="6" height="92" rx="3" fill="#2f7fd0"/>
+  <rect x="596" y="528" width="6" height="92" rx="3" fill="#2f7fd0"/>
+  <rect x="870" y="528" width="6" height="92" rx="3" fill="#2f7fd0"/>
+
+  <text x="70" y="560" font-size="18" font-weight="700" fill="#14233a">Windows</text>
+  <text x="70" y="580" font-size="13" fill="#5a6b82">x64</text>
+  <text x="70" y="604" font-size="12" fill="#7a8aa0">librtlsdr-v4.dll + libusb-1.0.dll</text>
+
+  <text x="344" y="560" font-size="18" font-weight="700" fill="#14233a">Linux</text>
+  <text x="344" y="580" font-size="13" fill="#5a6b82">x64 · Debian 12+, Ubuntu 22.04+</text>
+  <text x="344" y="604" font-size="12" fill="#7a8aa0">librtlsdr-v4.so · system libusb</text>
+
+  <text x="618" y="560" font-size="18" font-weight="700" fill="#14233a">Raspberry Pi</text>
+  <text x="618" y="580" font-size="13" fill="#5a6b82">Linux arm64 · Pi OS bookworm, trixie</text>
+  <text x="618" y="604" font-size="12" fill="#7a8aa0">librtlsdr-v4.so · system libusb</text>
+
+  <text x="892" y="560" font-size="18" font-weight="700" fill="#14233a">macOS</text>
+  <text x="892" y="580" font-size="13" fill="#5a6b82">Apple silicon and Intel (universal)</text>
+  <text x="892" y="604" font-size="12" fill="#7a8aa0">librtlsdr-v4.dylib · libusb built in</text>
+<metadata><c2pa:manifest>AAAWgmp1bWIAAAAeanVtZGMycGEAEQAQgAAAqgA4m3EDYzJwYQAAABZcanVtYgAAAEdqdW1kYzJtYQARABCAAACqADibcQN1cm46YzJwYTo1NTRjNmUxZC1lYzEyLTRmNjQtOWM3Ny00YTlkNzJmYTZhOGIAAAADl2p1bWIAAAApanVtZGMyYXMAEQAQgAAAqgA4m3EDYzJwYS5hc3NlcnRpb25zAAAAALxqdW1iAAAARGp1bWRjYm9yABEAEIAAAKoAOJtxE2MycGEuaW5ncmVkaWVudC52MwAAAAAYYzJzaK66BYZMrevxxgeJtZ5W9YMAAABwY2JvcqNpZGM6Zm9ybWF0bWltYWdlL3N2Zyt4bWxqaW5zdGFuY2VJRHgseG1wOmlpZDozM2UxMGMzOS1jNWI5LTQwOTctYjhiZi02ODVkNDE3MTJmZWJscmVsYXRpb25zaGlwaHBhcmVudE9mAAAB4mp1bWIAAABBanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5hY3Rpb25zLnYyAAAAABhjMnNo9L4Bp5qYRTAFu3vEte/7dAAAAZljYm9yomdhY3Rpb25zgqJmYWN0aW9ua2MycGEub3BlbmVkanBhcmFtZXRlcnOha2luZ3JlZGllbnRzgaJjdXJseC1zZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmluZ3JlZGllbnQudjNkaGFzaFggJPGlOwYHEhXOMs48dXGH3FG3MfaeZOMTfirDV8TxhaqkZmFjdGlvbngdY29tLmFudGhyb3BpYy5jbGF1ZGUucHJvdmlkZWRqcGFyYW1ldGVyc6F4H2NvbS5hbnRocm9waWMub3JpZ2luLWNvbmZpZGVuY2VndW5rbm93bmtkZXNjcmlwdGlvbnhmQ2xhdWRlIHByb3ZpZGVkIHRoaXMgZmlsZSBhdCB0aGUgcmVxdWVzdCBvZiBhIHVzZXIgYW5kIG1heSBoYXZlIGNyZWF0ZWQgb3IgbW9kaWZpZWQgdGhlIGZpbGUgY29udGVudHMubXNvZnR3YXJlQWdlbnShZG5hbWVmQ2xhdWRlcmFsbEFjdGlvbnNJbmNsdWRlZPUAAADIanVtYgAAAEBqdW1kY2JvcgARABCAAACqADibcRNjMnBhLmhhc2guZGF0YQAAAAAYYzJzaAlUIU3Ib4Qas5183rW5yIgAAACAY2JvcqVjYWxnZnNoYTI1NmNwYWRMAAAAAAAAAAAAAAAAZGhhc2hYICE3PIHkRSunuiRHQicBb8uANGz8bWvr3dynLD8WxY0yZG5hbWVuanVtYmYgbWFuaWZlc3RqZXhjbHVzaW9uc4GiZXN0YXJ0GSAgZmxlbmd0aBkeBAAAAj5qdW1iAAAAJ2p1bWRjMmNsABEAEIAAAKoAOJtxA2MycGEuY2xhaW0udjIAAAACD2Nib3KlY2FsZ2ZzaGEyNTZpc2lnbmF0dXJleE1zZWxmI2p1bWJmPS9jMnBhL3VybjpjMnBhOjU1NGM2ZTFkLWVjMTItNGY2NC05Yzc3LTRhOWQ3MmZhNmE4Yi9jMnBhLnNpZ25hdHVyZWppbnN0YW5jZUlEeCx4bXA6aWlkOjU5NDFhYTUxLTAzZjEtNDBjOC1iMTQ1LWYwZDRkNzI1NzQ3NHJjcmVhdGVkX2Fzc2VydGlvbnODomN1cmx4LXNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuaW5ncmVkaWVudC52M2RoYXNoWCAk8aU7BgcSFc4yzjx1cYfcUbcx9p5k4xN+KsNXxPGFqqJjdXJseCpzZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmFjdGlvbnMudjJkaGFzaFggANHXg2E4eCjaOsbnmTbH8E43aZso06sSkZihJOlecx2iY3VybHgpc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5oYXNoLmRhdGFkaGFzaFggU6Anz1o4M7q3NnPRkJ6bImwegjCWvWa4jWJAjGuGmrJ0Y2xhaW1fZ2VuZXJhdG9yX2luZm+jZG5hbWVvQW50aHJvcGljIEZpbGVzZ3ZlcnNpb25lMS4wLjBrc3BlY1ZlcnNpb25lMi40LjAAABA4anVtYgAAAChqdW1kYzJjcwARABCAAACqADibcQNjMnBhLnNpZ25hdHVyZQAAABAIY2JvctKEWQISogEmGCFZAgowggIGMIIBjaADAgECAhRA5aAK7sI50L64g/oGQgU9Z1UTADAKBggqhkjOPQQDAzBJMRcwFQYDVQQKEw5BbnRocm9waWMsIFBCQzEuMCwGA1UEAxMlQW50aHJvcGljIENvbnRlbnQgQ3JlZGVudGlhbHMgUm9vdCBDQTAeFw0yNjA4MDcxODQzNTZaFw0yODA4MDYxOTQzNTZaMEQxFzAVBgNVBAoTDkFudGhyb3BpYywgUEJDMSkwJwYDVQQDEyBBbnRocm9waWMgQ2xhdWRlIENvbnRlbnQgU2lnbmluZzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABJh6CmvLUBgFFNU0vUKlOVtE6djd17L5SuwX0LemFisBM3dkd/3cyjxFA3Qo5S46fX0/ihY0VZ7mfb9KF703t5OjWDBWMA4GA1UdDwEB/wQEAwIHgDAVBgNVHSUEDjAMBgorBgEEAYPoXgIBMAwGA1UdEwEB/wQCMAAwHwYDVR0jBBgwFoAUzlHiBIFOZFsj+OPEz5o+nMHXXMIwCgYIKoZIzj0EAwMDZwAwZAIwMXMdFJ4BetLLVY7ORuE9noqbbAZOZn/aArXyTwFAZfKrPzxF2vPoJNf1+UCdg1XGAjBwX1zd9WGqYkqmL5SFqw1QySjr1zJfpJM9+1rdDwSPLMOPOjKuiXjoU/pUUeG9RwmhY3BhZFkNngAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPZYQPMPjjWXSK8UNzE91eN19f4fc6NC5CviXCohGtA1T2Mm88fcwmLG6WlSs8q2+zWyJ+9XPRZNbZ/CvfOYP4MX0pk=</c2pa:manifest></metadata></svg>

@@ -1,20 +1,25 @@
 # Feedpoint - A Universal SDR Gateway
 
-Open-source RTL-SDR dongle server: tune, read, return raw IQ.
+Open-source RTL2832U dongle server: tune, read, return raw IQ.
 
-Feedpoint is a small standalone program that owns one RTL-SDR dongle. A host
+Feedpoint is a small standalone program that owns one RTL2832U dongle. A host
 program starts it, sends requests on its standard input and reads responses
-from its standard output. Each request is one librtlsdr call: list devices,
-open, set sample rate / frequency / gain, reset the buffer, read samples.
-Feedpoint does no signal processing; all timing and DSP belong to the host.
+from its standard output. Each request is one librtlsdr call: list and open
+dongles, tune (sample rate, frequency, bandwidth, gain, frequency correction,
+direct sampling, offset tuning, crystal frequency), switch the bias tee, read
+back the settings, and read samples. Feedpoint does no signal processing; all
+timing and DSP belong to the host.
 
 Any program that can start a process and use its pipes can use Feedpoint. The
 protocol is documented in [PROTOCOL.md](PROTOCOL.md).
 
+![How Feedpoint fits together: your program talks to Feedpoint over pipes; Feedpoint loads the approved librtlsdr driver, which reaches the SDR dongle over USB, on Windows, Linux, Raspberry Pi and macOS.](docs/feedpoint-architecture.svg)
+
 ## Example
 
 A minimal Python host: open the first dongle, tune to 147.600 MHz and read one
-block of raw IQ.
+block of raw IQ. For a fuller example that uses the 1.1 operations (gain list,
+reading settings back, IQ level), see [examples/](examples).
 
 ```python
 import struct, subprocess
@@ -34,6 +39,26 @@ class Op(IntEnum):              # matches PROTOCOL.md
     SET_TUNER_GAIN = 10
     RESET_BUFFER = 11
     READ_SYNC = 12
+    GET_VERSION = 13
+    GET_TUNER_GAINS = 14
+    GET_TUNER_GAIN = 15
+    GET_SAMPLE_RATE = 16
+    GET_CENTER_FREQUENCY = 17
+    GET_TUNER_TYPE = 18
+    SET_FREQUENCY_CORRECTION = 19
+    GET_FREQUENCY_CORRECTION = 20
+    SET_BIAS_TEE = 21
+    SET_BIAS_TEE_GPIO = 22
+    SET_DIRECT_SAMPLING = 23
+    GET_DIRECT_SAMPLING = 24
+    SET_OFFSET_TUNING = 25
+    GET_OFFSET_TUNING = 26
+    SET_XTAL_FREQUENCY = 27
+    GET_XTAL_FREQUENCY = 28
+    SET_TUNER_IF_GAIN = 29
+    GET_INDEX_BY_SERIAL = 30
+    GET_DEVICE_NAME = 31
+    GET_USB_STRINGS = 32
 
 fp = subprocess.Popen(["./feedpoint"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 
@@ -78,6 +103,9 @@ Open the folder in Visual Studio (File > Open > Folder) with the "Desktop
 development with C++" workload, or use CMake directly. GitHub Actions builds
 Windows x64, Linux x64, Linux arm64 and macOS (universal) on every push; the
 builds download from the workflow run's page.
+
+Tests run against a real dongle from Visual Studio's Test Explorer or VS
+Code's Testing panel; see [tests/README.md](tests/README.md).
 
 ## Roadmap and working on Feedpoint
 
