@@ -57,12 +57,16 @@ Mobile drivers come in through the driver rules in
 `ReadSync` asks for one block at a time, and the dongle sits idle between
 requests, so samples are lost in the gaps. That is fine for SNR snapshots but
 not for decoding (audio, APRS, ADS-B). 2.0 adds StartStream and StopStream:
-between them Feedpoint sends data frames continuously, using
-`rtlsdr_read_async`.
+between them Feedpoint sends data frames continuously from a dedicated reader
+thread.
 
 This changes the protocol from strictly one request and one response, and it
 needs a second thread in Feedpoint (operating system threads only, no
-library). It will be designed in an issue before any code is written.
+library). Hosts that never call the new operations keep working unchanged.
+
+Designed in [docs/streaming-design.md](docs/streaming-design.md). **Not
+scheduled:** audio through Feedpoint is excellent today, so this is held in
+reserve until a need shows up (for example AirPulse on Android).
 
 ## Not planned
 
